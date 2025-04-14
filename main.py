@@ -5,7 +5,7 @@ import subprocess
 import pytesseract
 import pyttsx3
 import ocr_module
-import face_module
+import face_module  # Now will use the function directly
 from picamera2 import Picamera2
 
 def detect_content_type(img):
@@ -18,7 +18,6 @@ def detect_content_type(img):
         return "face"
 
     # OCR detection
-    # Optional preprocessing
     gray_text = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
     text = pytesseract.image_to_string(gray_text)
     print("Detected text:", text.strip())  # DEBUG
@@ -27,7 +26,6 @@ def detect_content_type(img):
         return "text"
     else:
         return "currency"
-
 
 if __name__ == "__main__":
     print("Smart Assistant Running...")
@@ -38,7 +36,6 @@ if __name__ == "__main__":
     picam2.start()
 
     while True:
-        # Capture frame from Pi camera
         img = picam2.capture_array()
 
         if img is not None:
@@ -46,7 +43,7 @@ if __name__ == "__main__":
 
             if content_type == "face":
                 print("face")
-                subprocess.run(["python", "face_module.py"])  # Run face recognition as standalone
+                face_module.identify_face(img)  # Call function directly
             elif content_type == "text":
                 print("text")
                 ocr_module.read_text(img)
