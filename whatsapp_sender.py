@@ -43,3 +43,48 @@ else:
 import sys
 import select
 from whatsapp_sender import send_random_location
+
+
+
+
+# whatsapp_sender.py
+
+import random
+from twilio.rest import Client
+import threading
+
+# Twilio credentials
+account_sid = "your_account_sid"
+auth_token = "your_auth_token"
+from_whatsapp_number = 'whatsapp:+14155238886'
+to_whatsapp_number = 'whatsapp:+91xxxxxxxxxx'
+
+def send_message():
+    client = Client(account_sid, auth_token)
+
+    lat = f"17.52{random.randint(1000, 9999)}{random.randint(1000, 9999)}"
+    lon = f"78.36{random.randint(1000, 9999)}{random.randint(1000, 9999)}"
+
+    message = f"Emergency! Approx. Location: https://www.google.com/maps?q={lat},{lon}"
+
+    message = client.messages.create(
+        body=message,
+        from_=from_whatsapp_number,
+        to=to_whatsapp_number
+    )
+
+    print(f"[INFO] WhatsApp message sent: SID {message.sid}")
+
+def wait_for_keypress():
+    try:
+        key = input("Press 's' within 5 seconds to send WhatsApp location: ").strip().lower()
+        if key == 's':
+            send_message()
+    except:
+        pass
+
+def send_random_location():
+    timer = threading.Timer(5.0, lambda: print("[INFO] No input. Continuing..."))
+    timer.start()
+    wait_for_keypress()
+    timer.cancel()
