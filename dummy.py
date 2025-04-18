@@ -30,3 +30,8 @@ command = listen_for_voice_command()
 if "save me" in command:
     print("Emergency command detected! Calling emergency module...")
     emergency_module.handle_emergency()
+
+
+
+sudo apt update
+sudo apt install portaudio19-dev python3-pyaudio python3-dev
