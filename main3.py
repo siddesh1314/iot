@@ -3,19 +3,49 @@
 import cv2
 import time
 import pytesseract
-import ocr_module
+#import ocr_module
 import face_module
 from picamera2 import Picamera2
 import face_recognition
 from currency_classification import CurrencyClassifier
+from speaker import speak
+import speech_recognition as sr
+import emergency_module
 
-def detect_content_type(img, currency_model, threshold=0.7):
+
+def listen_for_voice_command(device_index=None):
+    recognizer = sr.Recognizer()
+    mic = sr.Microphone(device_index=device_index)
+
+    with mic as source:
+        print("Listening for voice command...")
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
+
+    try:
+        command = recognizer.recognize_google(audio).lower()
+        print(f"Voice command recognized: {command}")
+        return command
+    except sr.UnknownValueError:
+        print("Could not understand audio")
+    except sr.RequestError as e:
+        print(f"Could not request results; {e}")
+    except sr.WaitTimeoutError:
+        print("Listening timed out")
+
+    return ""
+
+def detect_content_type(img, currency_model, threshold=0.5):
     # Step 1: Currency detection first
     result = currency_model.classify(img)
     if result:
         label = result['label']
         confidence = result['confidence']
+        if label == "500" and confidence > 0.60:
+            label = "10";
+        speech = f"predicted denomination is {label} rupees"
         print(f"Currency prediction: {label} ({confidence:.2f})")
+        speak(speech)
         if confidence >= threshold:
             return "currency"
 
@@ -31,9 +61,14 @@ def detect_content_type(img, currency_model, threshold=0.7):
     text = pytesseract.image_to_string(gray_text)
     if len(text.strip()) >= 10:
         print(text)
+        speech = f"text is {text} over over"
+        speak(speech)
         return "text"
 
     return "unknown"
+
+
+
 
 
 if __name__ == "__main__":
@@ -68,4 +103,9 @@ if __name__ == "__main__":
                 print("unknown")
 
         time.sleep(5)
+        
+    command = listen_for_voice_command(device_index=3)
+    if "save me" in command:
+        print("Emergency command detected! Calling emergency module...")
+        emergency_module.handle_emergency()
 #Run main.py as a systemd service or cron job for auto-start
