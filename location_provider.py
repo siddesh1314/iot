@@ -53,3 +53,37 @@ if __name__ == "__main__":
         lat_real, lon_real = gps.parse_gps_data(raw)
         print("Real GPS:", lat_real, lon_real)
     print("Using fallback location:", lat, lon)
+
+
+
+
+
+
+import serial
+import pynmea2
+
+def get_gps_coordinates(serial_port='/dev/ttyS0', baudrate=9600, timeout=1):
+    try:
+        with serial.Serial(serial_port, baudrate=baudrate, timeout=timeout) as ser:
+            while True:
+                line = ser.readline().decode('ascii', errors='replace')
+                if line.startswith('$GPGGA') or line.startswith('$GPRMC'):
+                    try:
+                        msg = pynmea2.parse(line)
+                        if msg.latitude and msg.longitude:
+                            return msg.latitude, msg.longitude
+                    except pynmea2.ParseError:
+                        continue
+    except serial.SerialException as e:
+        print(f"Serial error: {e}")
+        return None, None
+
+def main():
+    lat, lon = get_gps_coordinates()
+    if lat is not None and lon is not None:
+    else:
+        print("Failed to get GPS coordinates.")
+
+if __name__ == '__main__':
+    main()
+
