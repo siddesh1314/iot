@@ -1,0 +1,122 @@
+-- ==============================
+-- Part 2: Create Database & Table
+-- ==============================
+
+-- Step 1: Create the database
+CREATE DATABASE FINSECUREDB;
+GO
+
+-- Step 2: Switch to the new database
+USE FINSECUREDB;
+GO
+
+-- Step 3: Create the EMPLOYEE table
+CREATE TABLE EMPLOYEE (
+    EMP_NO INT PRIMARY KEY,
+    BIRTH_DATE DATE,
+    FIRST_NAME NVARCHAR(50),
+    LAST_NAME NVARCHAR(50),
+    GENDER CHAR(1),
+    HIRE_DATE DATE
+);
+GO
+
+-- Step 4: Insert sample data
+INSERT INTO EMPLOYEE (EMP_NO, BIRTH_DATE, FIRST_NAME, LAST_NAME, GENDER, HIRE_DATE)
+VALUES 
+(1, '1990-05-12', 'John', 'Doe', 'M', '2020-01-15'),
+(2, '1988-08-23', 'Jane', 'Smith', 'F', '2019-03-10');
+GO
+
+-- Step 5: Check database files information
+SELECT 
+    name AS LogicalFileName,
+    physical_name AS PhysicalFileName,
+    type_desc AS FileType,
+    size * 8 / 1024 AS SizeMB
+FROM sys.database_files;
+GO
+
+-- ==============================
+-- Part 3: Backup and Recovery
+-- ==============================
+
+-- Step 6: Full Backup (Append Mode) - First Time
+BACKUP DATABASE FINSECUREDB
+TO DISK = 'C:\backup\finsecuredb_append.bak'
+WITH NOINIT;
+GO
+
+-- Step 7: Full Backup (Append Mode) - Second Time
+BACKUP DATABASE FINSECUREDB
+TO DISK = 'C:\backup\finsecuredb_append.bak'
+WITH NOINIT;
+GO
+
+-- Step 8: Full Backup (Append Mode) - Third Time
+BACKUP DATABASE FINSECUREDB
+TO DISK = 'C:\backup\finsecuredb_append.bak'
+WITH NOINIT;
+GO
+
+-- Step 9: Full Backup (Override Mode) - First Time
+BACKUP DATABASE FINSECUREDB
+TO DISK = 'C:\backup\finsecuredb_override.bak'
+WITH INIT;
+GO
+
+-- Step 10: Full Backup (Override Mode) - Second Time
+BACKUP DATABASE FINSECUREDB
+TO DISK = 'C:\backup\finsecuredb_override.bak'
+WITH INIT;
+GO
+
+-- Step 11: Full Backup (Override Mode) - Third Time
+BACKUP DATABASE FINSECUREDB
+TO DISK = 'C:\backup\finsecuredb_override.bak'
+WITH INIT;
+GO
+
+-- Step 12: Differential Backup
+BACKUP DATABASE FINSECUREDB
+TO DISK = 'C:\backup\finsecuredb_diff.bak'
+WITH DIFFERENTIAL, INIT;
+GO
+
+-- Step 13: Transaction Log Backup
+BACKUP LOG FINSECUREDB
+TO DISK = 'C:\backup\finsecuredb_log.trn';
+GO
+
+-- Step 14: List All Backups Taken Today
+SELECT 
+    database_name,
+    backup_start_date,
+    backup_finish_date,
+    CASE backup_type 
+        WHEN 1 THEN 'Full'
+        WHEN 2 THEN 'Differential'
+        WHEN 3 THEN 'Transaction Log'
+        ELSE 'Other'
+    END AS backup_type,
+    physical_device_name
+FROM msdb.dbo.backupset
+WHERE database_name = 'FINSECUREDB'
+AND backup_start_date >= CAST(GETDATE() AS DATE)
+ORDER BY backup_start_date DESC;
+GO
+
+-- Step 15: List Logical Names in Backup
+RESTORE FILELISTONLY
+FROM DISK = 'C:\backup\finsecuredb_append.bak';
+GO
+
+-- Step 16: Restore Database with Different Name
+-- !!! Before running this, create a folder C:\DBFiles manually !!!
+RESTORE DATABASE FinSecureDBDemo
+FROM DISK = 'C:\backup\finsecuredb_append.bak'
+WITH 
+MOVE 'LogicalDataFileName' TO 'C:\DBFiles\FinSecureDBDemo.mdf',
+MOVE 'LogicalLogFileName' TO 'C:\DBFiles\FinSecureDBDemo_log.ldf',
+NOUNLOAD, REPLACE, STATS = 10;
+GO
