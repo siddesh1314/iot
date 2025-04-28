@@ -1,0 +1,1317 @@
+Get-ExecutionPolicy
+
+Set-ExecutionPolicy -ExecutionPolicy Restricted
+
+# Single line commenting
+<# Multi line commenting #>
+
+#Unrestricted
+#Restricted
+#Allsigned
+#Defualt
+#Remote signed
+#Undefined
+
+#It will list you all the commands of the PS session
+
+get-command
+
+get-verb
+
+
+get-command -verb get # List all commands starting with get
+
+#Pattern matching
+
+get-command -verb set -Noun *event*
+
+get-command *firewall**rule*
+
+get-command *firewall**list*
+
+
+(get-verb).count
+
+
+(get-command -verb set -Noun *event*).count
+
+
+#Assignment 1
+#=============
+#What command would you run to resolve a DNS name?
+
+get-command *Resolve**DNS**Name*
+ 
+Resolve-DnsName
+
+#Display a list of enabled Windows Firewall rules.
+
+ 
+get-command  *enable**Firewall**Rule*
+ 
+ 
+Enable-NetFirewallRule
+
+#What command would you run to make changes to a network adapter?
+
+get-command *network**adapter*
+
+get-command *adapter*
+
+ Set-NetAdapter 
+ 
+
+#What command would let you enable a previously disabled scheduled task?
+
+get-command *schedule*
+ 
+ Enable-ScheduledTask
+
+#What command would you run to clear your computer’s local BranchCache cache?
+get-command *clear**Cache*
+ 
+clear-BCCache
+
+#What command would let you block access to a file share by a particular user?
+
+get-command *block**access*
+ 
+Block-FileShareAccess
+
+#Transcript -- get the history commands
+
+#enable transcript
+
+Start-Transcript "c:\Logs\day1.txt"
+
+get-host
+
+#Help system
+Update-Help
+
+get-help get-host
+
+get-help get-command -Full
+
+get-help get-verb -detailed
+
+get-help get-host -examples
+
+get-help get-host -online
+
+get-help get-verb -showwindow
+
+
+#stop transcript
+
+Stop-Transcript
+
+#about files - check about specific topic
+
+get-help *about*
+
+get-help about_testdrive
+
+
+#Create transcript file and try to analyse the history
+#using help system try to get examples of get_verb & get-host and get the online URL
+
+Get-Help Get-Verb -Examples
+ 
+get-Help get-host -Examples
+ 
+get-help get-host -online
+
+#Find the different categories of module type in a module. 
+
+get-help *module*
+
+Get-Module -ListAvailable
+
+#get command to get the schedule task which are relevant to WiFiTask
+
+get-command *sched**task*
+
+Get-ScheduledTask *WiFiTask*
+
+#Aliases -- short name/nick name
+#global alaises -- system defined aliases
+#user defined aliases -- user created alias
+
+get-alias
+
+get-alias -definition get-command
+
+#Alias should start with char or _
+#It cannot start with numbers
+#Length is not > 10
+
+#create alias
+
+Set-Alias -Name gh -Value get-host
+
+get-alias -definition get-host
+
+get-alias -Name gh
+
+Remove-Item -Path alias:gh
+
+get-help Clear-Host
+
+Clear-Host
+
+get-alias -Definition clear-host
+
+
+
+#Pipeline (|)
+
+#command A | Command B
+
+#filtering
+#converting
+#output file
+#measuring
+
+get-service
+
+#filtering (select-object and where-object)
+
+get-service | Where-Object -Property status -EQ "Running"
+
+get-alias -definition where-object
+
+get-service | where -Property status -NE "Running"
+
+get-service | Select-Object -Property name,status | where -Property status -NE "Running"
+
+
+get-alias -definition select-object
+
+get-process | where cpu -GE 300
+
+#output file
+
+get-service | Out-File "C:\Logs\ser.txt"
+
+get-service | select name | Out-File "C:\logs\ser_name.txt"
+
+1,2,3,4,5|Out-File "c:\logs\no.txt"
+
+
+
+
+
+
+
+
+
+Day 2-------------------------------------------
+
+#measuring (measure-object and sort-object)
+ 
+23,12,59,54,65 | measure -Sum -Average -Maximum -Minimum
+ 
+23,12,59,54,65 | measure
+ 
+get-service | measure -Line -Character -Word -Property name
+ 
+get-process | measure -Property CPU -Sum -Average -Maximum -Minimum
+ 
+#Sort
+ 
+get-service | sort name -Descending
+ 
+get-service | select name,status |sort status
+ 
+23,12,59,54,65 | sort
+ 
+ 
+#Converting
+#csv,json,xml,html,etc
+ 
+get-service |ConvertTo-Csv| Out-File "C:\Logs\serv.csv"
+ 
+get-service | select name,status | ConvertTo-Json | Out-File "C:\Logs\serv.json"
+ 
+get-service | select name,status | ConvertTo-Html -Title "Service"| out-file "C:\Data\serv.html"
+ 
+#format the output
+ 
+get-service | Format-List
+ 
+get-service | select -Property *
+ 
+get-service | Format-Wide -Column 4
+ 
+get-service | Format-Wide -AutoSize
+ 
+get-service | Format-Table -Property name,status
+ 
+#Variables -- used to store data and process the data ($)
+ 
+Update-Help
+get-help about_variables
+ 
+#Automatic variable
+#Predefined variable
+#user defined variable
+ 
+#Automatic variable
+ 
+#System defined variables
+#it cannot be altered
+ 
+$PSVersionTable
+ 
+$PSHOME
+ 
+#Predefined variable
+#defined already but it can be customized
+ 
+$ConfirmPreference
+ 
+$ConfirmPreference = "Medium"
+ 
+#User defined variable
+#user created variables
+ 
+#Dynamic typed variable
+ 
+$a =10
+ 
+Write-Output "The value of a is :$a"
+ 
+$b = "accenture"
+ 
+write $b
+ 
+$a | get-member
+ 
+$b | get-member
+ 
+$a = "Accenture"
+ 
+write $a
+ 
+#Strongly typed variable
+ 
+[int]$c = 33
+ 
+write $c
+ 
+$c | get-member
+ 
+$C =90
+ 
+write $c
+ 
+$c = "Banglore"
+ 
+[string]$s = "Accenture"
+ 
+$s | get-member
+ 
+$s = 45
+ 
+#DT - int,string,boolean, datetime,float,double
+ 
+get-date
+ 
+[datetime]$dt = get-date
+ 
+write $dt
+ 
+[bool]$res = $true
+write $res
+ 
+[bool]$r = 20 -gt 50
+write $r
+ 
+#String variable
+#variable inside double quote it will print the value of the variable
+ 
+$n1 = 30
+$n2 = 90
+$n3 = $n1+$n2
+write "Addition of $n1 and $n2 is $n3"
+ 
+#String literal
+ 
+write 'Addition of $n1 and $n2 is ' "$n3"
+#mathematical functions
+#abs()
+#round()
+#truncate()
+#sqrt()
+#max,min()
+ 
+$abs = [math]::abs(-32)
+ 
+$rd = [math]::Round(15.39380400259)
+ 
+[math]::Truncate(34.5674)
+ 
+[math]::Sqrt(54)
+ 
+[math]::Min(3,45)
+
+#string function
+ 
+#substring($start,$length)
+ 
+$word = "This is powershell"
+ 
+$word.substring(8)
+
+$word.Replace("is","a")
+ 
+$w = "             Powershell                 "
+ 
+$w.Trim()
+ 
+$w.TrimStart()
+ 
+$w.TrimEnd()
+ 
+$word.ToLower()
+ 
+$word.ToUpper()
+ 
+$dt.Hour
+ 
+$dt.Date
+ 
+$dt.Day
+ 
+$dt.DayOfWeek
+ 
+$dt.AddDays(5)
+ 
+$dt.AddYears(2)
+ 
+#arrays -- store collection of value in a single variable. index starts from 0
+ 
+#Initialization of array
+#Accessing elements of array
+#Size of the array
+#Manipulation of array
+ 
+#Initialization
+ 
+$k = 10,20,30,40,50
+ 
+$rr = @(32,34,676,78)
+ 
+$ss = 11..30
+ 
+#accessing the array
+ 
+#Display 1st element of array
+$k[0]
+ 
+$k[-1]
+ 
+$k[3]
+ 
+$ss[6..12]
+ 
+#Size of array
+ 
+$k.Length
+ 
+$ss.Length
+ 
+#Manipulation of array
+ 
+$k += 8
+ 
+$k[3] = 90
+ 
+#loops -- for,foreach,if,switch
+ 
+#For loop
+ 
+<#
+syntax
+ 
+for(delcaration;condition;increment)
+{
+    for block
+}
+#>
+ 
+#Print the numbers from 0 to 10
+for($i=0;$i -le 10;$i++)
+{
+    write $i
+}
+ 
+$arr1 = 23,45,67,89,67,12,34
+for($i=0;$i -lt 3;$i++)
+{
+    write $arr1[$i]
+}
+ 
+#nested for loop
+ 
+#
+##
+###
+####
+#####
+ 
+for($i=0;$i -le 5;$i++)
+{
+    for($j=$i;$j -ge 0;$j--)
+    {
+    Write-Host "#" -NoNewline
+    }
+    write ""
+}
+ 
+
+
+
+
+
+
+
+
+
+
+#Day3------------------------------------
+
+#check if a number is even or odd?
+ 
+if(54 % 2 -eq 0){
+    write "even"
+}
+else{
+    write "odd"
+}
+#find square of each number in an array using foreach loop
+ 
+$arr2 = @(1,2,3,4,5)
+ 
+foreach($num in $arr2){
+    write " Square of $num is $($num * $num)"
+}
+
+#write a powershell script to display days of the week using switch statement and foreach
+$week = 1..7
+ 
+foreach($i in $week){
+    switch($i){
+    "1" {write " Monday"}
+    "2" {write " Tuesday"}
+    "3" {write " Wednesday"}
+    "4" {write " Thursday"}
+    "5" {write " Friday"}
+    "6" {write " Saturday"}
+    "7" {write " Sunday"}
+    defaule {write "enter no between 1 to 7"}
+ 
+}
+}
+ 
+
+#Use switch statement to check the number and print the number value.
+ 
+$inp = Read-Host "Enter a number"
+ 
+switch($inp){
+ 
+"1" {write "One"}
+"2" {write "Two"}
+"3" {write "Three"}
+default {Write "invalid number"}
+}
+
+#Create a string array with variable $array with values (viki,ravi,raju) and check if the value is available in the array
+
+ 
+$array = @("viki","ravi","raju")
+if($array -contains "viki")
+{
+    write {"Viki is available"}
+}
+else
+{
+    write "viko not available"
+}
+ 
+write $array.Contains("viki")
+ 
+ 
+#get the day of the week and print if its a week day or weekend using switch case
+ 
+ 
+$day = (Read-Host "Enter a day").ToLower()
+ 
+switch($day)
+ 
+{
+ 
+"monday" {"Weekday"}
+
+"tuesday" {"Weekday"}
+
+"wednesday" {"Weekday"}
+
+"thursday" {"Weekday"}
+
+"friday" {"Weekday"}
+
+"saturday" {"Week end"}
+
+"sunday" {"Week end"}
+ 
+default {"Invalid input"}
+ 
+}
+ 
+#Hashtables -- collection of keys and values --unordered collection of keys and values
+
+$hst = @{100="u1";200="u2";300="u3"}
+
+$hst
+
+$hst[200]
+
+$student = @{name = "John";course="BCA";Age = 19}
+
+$student
+
+$student.Keys
+
+$student.Values
+
+$student.Count
+
+$student['course']
+
+$student['Marks']=90
+
+$student['Marks']=75
+
+$student.Remove('age')
+
+#Filesystem
+
+$PWD
+
+Set-Location C:\Logs
+
+get-alias -definition Set-Location
+
+cd C:\Users\Training1
+
+cd ..
+
+get-alias -name md
+
+get-alias -name rd
+
+get-alias -definition get-childitem
+
+get-childitem
+
+#create file/folder
+
+cd C:\Users\Training1
+
+new-item -Path . -Name "test.txt" -ItemType "File" -Value "This is a test file"
+
+
+New-Item -Path "c:\" -Name "Day3" -ItemType "Directory"
+
+#create multiple files
+
+new-item -ItemType "File" -Path "C:\Day3\day3.txt","C:\Logs\day3.txt"
+
+#Add content -- append the text
+
+Add-Content -Path "C:\Day3\day3.txt" -Value "This is a text file2"
+
+#set content -- replace
+
+Set-Content -Path "C:\Logs\day3.txt" -value "This is day3 PS session"
+
+get-content -Path "C:\Logs\day3.txt"
+
+get-content -Path "C:\day3\day3.txt"
+
+if(Test-Path "C:\PS")
+{
+    write "Day 3 folder is present create a different folder"
+}
+else
+{
+    new-item -Path "C:\PS" -ItemType "Directory"
+}
+
+rd c:\ps
+
+rd C:\logs\day3.txt
+
+get-content "C:\Day3"
+
+get-content "C:\Logs\day1.txt"
+
+ls
+
+get-childitem "C:\Day3"
+
+
+#Create an empty file and write a script to check if it is a empty file or not
+#Add contents to the file and try to verify the same script
+
+New-Item -Path . -Name "testt11.txt" -ItemType "file"
+
+$file = "C:\Users\training1\testt12.txt"
+
+New-Item -Path . -Name "testt12.txt" -ItemType "file" -Value "This is a test file"
+
+
+# Check if the file is empty
+$content = Get-Content -Path $file
+if ($content -eq $null -or $content.Count -eq 0) {
+    Write "The file is empty"
+} else {
+    Write "The file has content"
+}
+
+ 
+#create an hash table maillist
+#add keys and values to the hash table
+#User Frank with the email address Frank@mic.com
+#User Libby with the email address Libby@mic.com
+#User Mateo with the email address MStojanov@mic.com
+ 
+$maillist = @{
+    Frank = "Frank@mic.com";
+    Libby = "Libby@mic.com";
+    Mateo = "MStojanov@mic.com";
+}
+#display the contents of maillist
+$maillist
+#display value for libby
+ 
+$maillist['Libby']
+#add new value Stela: Stela@mic.com
+ 
+$maillist['Stela']="Stela@mic.com"
+ 
+#remove frank from maillist
+ 
+$maillist.Remove('Frank')
+ 
+#verify frank is removed
+$maillist.Contains('Frank')
+
+#PSDrive & PSProvider
+
+# PSDrive is a data store location . Store and access the file
+
+get-psdrive
+
+get-psdrive -PSProvider FileSystem
+
+get-command -name Get-PSDrive -syntax
+
+#activedirectory
+#accenture(root)
+#user profiles
+#computers will be created
+#Security groups
+#P1 -- Microsoft products
+
+#P2 -- Oracle products
+#Key creation
+
+#folder-hives
+
+get-psdrive
+
+#HKCU -- HKEY_Current user (Current user)
+#HKLM -- HKEY_Local_Machine (server)
+
+#registry editor (This is not primary tool)
+
+cd HKLM:\SOFTWARE\Microsoft
+
+New-Item -Name "APP5" -Path . -ItemType "Directory"
+
+
+get-psprovider
+
+ls
+
+New-ItemProperty -Name "APPS" -Path "HKLM:\SOFTWARE\Microsoft\APP5"
+
+
+Set-ItemProperty -Name "APPS" -Path "HKLM:\SOFTWARE\Microsoft\APP5" -Value "Test"
+
+cd APP5
+
+ls
+
+cd ..
+
+ls
+
+
+#server manager (primary tool for AD)
+#create users profiles/computers/security
+
+#2 roles
+#ADDS -- Active directory domain services -- allows server to function as DC
+#domaincontroller (DC) -- manage/create users/groups/computers
+#WS -- allows server to host website
+
+
+
+#Day4-----------------------------------------------------
+
+#create a hash table with key as "ID,shape and color with values 1,square,blue.
+ 
+$ht1 = @{
+ 
+    ID = 1;
+    Shape = "square";
+    color = "blue";
+ 
+}
+ 
+#Print only hashtable keys
+ 
+write $ht1.Keys
+ 
+#Print only hashtable values
+ 
+write $ht1.Values
+ 
+#Get and print the count of hashtable
+ 
+write $ht1.Count
+ 
+#Update hashtable with new key= Updated and value = Now
+ 
+$ht1['Updated'] = "Now"
+ 
+#Add a new key and value. key = Created and value = Now
+ 
+$ht1['Created'] = "Now"
+ 
+#Verify whether 2 entries got added to the hashtable by counting the size of hash
+ 
+write $ht1.Count
+ 
+#Remove the created key from hashtable
+ 
+$ht1.Remove('Created')
+ 
+#Print the hash table and verify.
+ 
+write $ht1
+ 
+#=======================================================
+ 
+ 
+# Create an array
+ 
+$numarr = @(1,2,3,4,5)
+ 
+# Measure the count of numbers using measure object
+ 
+$num_c = ($numarr | measure).Count
+ 
+# Measure the sum of numbers  using measure object
+ 
+$num_sum = ($numarr | measure -Sum).sum
+ 
+# Measure the average of numbers  using measure object
+ 
+$num_avg = ($numarr | measure -Average).Average
+ 
+# Measure the minimum and maximum values  using measure object
+ 
+$num_max = ($numarr | measure -Maximum).Maximum
+
+Write "Count of array is $num_c and sum of array is $num_sum"
+
+#Create an organizational unit
+
+New-ADOrganizationalUnit -name Myorg -Path "DC=ACC;DC=TRAININGAD;DC=NET"
+
+#Create a new user
+
+New-ADUser -Name "Testuser1" -SamAccountName "Testuser1" -Path "CN=users;DC=ACC;DC=TRAININGAD;DC=NET"
+
+#Create a computer
+
+New-ADComputer -Name "Comp1" -SAMAccountName "Comp1" -path "CN=computers;DC=ACC;DC=TRAININGAD;DC=NET"
+
+#Create security group
+
+New-ADGroup -Name PSadmingroup -GroupScope Global -SamAccountName psadmingroup -Path "ou=myorg;DC=ACC;DC=TRAININGAD;DC=NET"
+
+#add user to security group
+
+Add-ADGroupMember -Identity PSadmingroup -Members "Testuser1"
+
+Remove-ADGroupMember -Identity PSadmingroup -Members "Testuser1"
+
+#Create user with password
+
+$pwd = "ASdf1234"
+
+$spwd = ConvertTo-SecureString $pwd -AsPlainText -Force
+
+New-ADUser -Name "Comp2" -SamAccountName "Comp1" -AccountPassword $spwd -Path "CN=users;DC=ACC;DC=TRAININGAD;DC=NET"
+
+$csv = Import-Csv -Path "C:\Day3\output.csv"
+
+foreach($item in $csv)
+{
+    $name = "$($item.username)"
+    $pwdd = "$($item.password)"
+    $spwdd = ConvertTo-SecureString $pwdd -AsPlainText -Force
+
+    New-ADUser -Name $name -AccountPassword $spwdd
+}
+
+#Remoting
+#Windows remote management(WINRM)
+#2 types -- 1 to 1 remoting, 1 to many remoting
+
+#1 to 1 remoting (non-persistent)
+
+Enter-PSSession -ComputerName localhost
+
+get-service
+
+#variables used inside the session cannot be accessed outside the session -- non persistent session
+
+$p = get-process
+
+Exit-PSSession
+
+$p
+
+#with credentials
+
+$cred = Get-Credential -Message "Login"
+
+Enter-PSSession -ComputerName localhost -Credential $cred
+
+
+#1 to many remoting (Persistent session)
+#establish connection to multiple servers
+
+$pp = New-PSSession -ComputerName localhost
+
+$pp
+
+
+$proc = Invoke-Command -Session $pp -ScriptBlock {get-service}
+
+get-pssession | Remove-PSSession
+
+get-pssession | where id -EQ 4 | Remove-PSSession
+
+$proc
+
+#functions -- grouping of code that has an optional input and output
+#execute the logic one or more times just by pointing to the function and this avoids code duplicates
+
+<#syntax
+function functionname
+{
+    param()
+    function block
+}
+#>
+
+#Function declaration
+
+function add
+{
+    param($v1,$v2)
+    $total = $v1+$v2
+    write $total
+}
+
+#function calling
+
+add 10 40
+
+add 42 56
+
+#default parameter & strongly typed function
+
+function greet
+{
+    param([string]$str = "World!!")
+
+    Write-Host "Hello, $str!!"
+}
+
+greet Alice
+
+greet
+
+#write a function to add 3 numbers use default parameter
+
+function add_3
+{
+    param($n1,$n2,[int]$n3=0)
+    $sum = $n1+$n2+$n3
+    write $sum
+}
+
+add_3 3 5
+
+#array inside a function
+
+#Sum of array
+
+function sumofarray
+{
+    param([int[]] $nos)
+    $tot=0
+    foreach($item in $nos)
+    {
+        $total = $total+$item
+    }
+    write "Sum of array elements $total"
+}
+
+
+sumofarray 100,200,300,400,500
+
+#Area of rectangle
+
+function rectangle
+{
+    param ([double]$len,[double]$bre)
+    $area = $len * $bre
+    write "Area of rectangle is $area"
+}
+
+rectangle 3456 980
+
+
+#check odd or even number using functions
+
+function OddEven
+{
+    param([int]$num)
+    if($num%2 -eq 0)
+    {
+        write "$num is even"
+    }
+    else
+    {
+        write "$num is odd"
+    }
+}
+ 
+OddEven 11
+ 
+# Define a function to print student details
+
+function GetStudent{
+    param($hash)
+    write "Student name is $($hash['name']) and the roll no is $($hash['rollno'])"
+}
+ 
+$hash = @{ name = "Sanjay";rollno = "123"}
+GetStudent $hash
+ 
+#create a PowerShell function that allows you to add or subtract a specific number of days from a given date?
+function Add-DaysToDate {
+    param (
+        [datetime]$InputDate,
+        [int]$Days
+    )
+    
+    # Calculate the new date
+    $newDate = $InputDate.AddDays($Days)
+    return $newDate
+}
+
+# Example usage
+
+$newDate = Add-DaysToDate "2024-10-16" 10
+Write-Output "The new date, 10 days after $date, is $newDate."
+
+#Modules -- collection of code(functions/cmdlets/scripts)
+
+#3 types of modules
+#Microsoft provided module
+#3rd party module
+#user defined modules
+
+#Microsoft provided module
+
+get-help get-module
+
+get-module -listavailable -Name Microsoft*
+
+get-command -Module Microsoft.PowerShell.Utility
+
+get-command -Module Microsoft.PowerShell.host
+
+#3rd party module
+#developed and maintained by entity other than Microsoft
+
+
+Get-InstalledModule
+
+ Install-Module -Name Azure 
+
+ find-module -Name *
+
+ #user defined modules -- developed and maintained by users
+
+ #Create a folder
+ #Manifest file -- data file (.psd1)
+ #Code file -- (.psm1)
+ #all 3 above should be of same name
+
+
+ #Manifest
+
+ New-ModuleManifest -Path "C:\Day3\multiplication\multiplication.psd1"
+
+ get-module -ListAvailable
+
+ Import-Module -Name multiplication
+ multiplication 5 7
+
+ #Day5
+ #======
+
+ #Jobs
+ #CIM/WMI
+ #Azure powershell (only theory)
+
+ #Jobs -- block of code which will assign some task to PS
+ #Runs in the background leaving the main powershell session free
+ #2 types -- Background job and scheduled job
+
+ #Background job -- job will be executed in seperate background (Asynchronous execution)
+ #Job cmdlets -- start-job/receive-job/stop-job/remove-job/get-job
+
+ #Used to test reachablity of network device
+ 
+ ping localhost
+
+ ping localhost -n 10
+
+Start-Job -Name "Ping" -ScriptBlock {ping localhost -n 10}
+
+
+get-job
+
+Receive-Job -Name Ping
+
+Test-Connection -ComputerName 'localhost' -Count 10
+
+$proc_job = Start-Job -ScriptBlock {get-process}
+
+$proc_out = Receive-Job -Job $proc_job
+
+$proc_out |Out-File "c:\Logs\procjob.txt"
+
+remove-job -Name Ping
+
+
+get-job
+
+$proc_job.State
+
+Start-Job -Name "TEST_CONNECT" -ScriptBlock{ Test-Connection -ComputerName localhost -Count 20 | Out-File "c:\logs\task.txt"}
+
+#Sleep job
+
+$sleep_job = Start-Job -ScriptBlock {Start-Sleep -Seconds 20 
+write "Sleep_job1 is completed"}
+
+
+if($sleep_job.State -eq "Running")
+{
+    Start-Sleep -Seconds 21
+    Receive-Job -job $sleep_job
+    $Print_job = Start-Job -ScriptBlock {write "This is job 2"}
+    Receive-Job -Job $Print_job
+}
+
+#Create a job to count number of files inside a folder
+#Printout of the job
+
+# Define the folder path
+$folderPath = "C:\logs"
+
+# Start a background job to count the files
+$job = Start-Job -ScriptBlock {
+    param ($path)
+    
+    # Count the files in the specified folder
+    $fileCount = (Get-ChildItem -Path $path -File).Count
+    Write-Output "Number of files in '$path': $fileCount"
+} -ArgumentList $folderPath
+
+
+Receive-Job -Job $job
+
+Assignment
+========
+# Define a script block to be executed in the background job
+# Start the background job
+# Check if the job started successfully
+# Retrieve  the job output
+# Remove the job from the job repository
+
+# Define a script block to be executed in the background job
+$scriptBlock = {
+    Write-Output "This is a background job without parameters."
+    Start-Sleep -Seconds 3
+    Write-Output "Background job completed."
+}
+
+# Start the background job
+$job = Start-Job -ScriptBlock $scriptBlock
+
+# Check if the job started successfully
+if ($job.State -eq "Running") {
+    Write-Host "Background job started."
+} else {
+    Write-Host "Failed to start background job."
+}
+
+
+# Retrieve and display the job output
+$output = Receive-Job -Job $job
+Write-Host "Job output:"
+Write-Host $output
+
+# Remove the job from the job repository
+Remove-Job -Job $job
+
+#Scheduled job -- your going to schedule a task to be executed in later time and date
+
+#3 paramaters for scheduled job
+#Create trigger variable
+#Create an optional variable
+#Register the job
+
+#Creation of trigger (start time and date of the job)
+
+$trig = New-JobTrigger -Daily -At 6:12AM
+
+#optional variable
+
+$opt = New-ScheduledJobOption -StartIfOnBattery
+
+#register the job
+
+Register-ScheduledJob -Name service -ScriptBlock {get-service|Out-File "C:\logs\Servjob.txt"} -Trigger $trig -ScheduledJobOption $opt
+
+
+Get-ScheduledJob
+
+$sb = {
+        $ct = Get-Date
+        "Current time : $ct"|Out-File "C:\logs\dt.txt"
+}
+
+$trig_dt = New-JobTrigger -Weekly -DaysOfWeek Wednesday -At 6:18AM
+
+Register-ScheduledJob -Name "Datetime" -ScriptBlock $sb -Trigger $trig_dt
+
+$trig_dt = New-JobTrigger -Once -At (get-date).AddHours(2)
+
+$trig_dt = New-JobTrigger -WeeksInterval 4 -At 
+
+#CIM/WMI -- get system information
+
+#CIM -- Common information model -- moder approach
+#Better performance and security
+#Uses WSMan for communication
+#Cross platform
+
+#WMI -- Windows management instrumentation -- detoriating -- WMI is microsoft technology
+#Disadvantage of WMI
+#Uses DCOM for communication -- slow and less secure
+#Used only windows OS and its cross platform
+
+get-command -noun *CIM*
+
+Get-CimInstance -Query "Select * from win32_BIOS"
+
+Get-WmiObject -Query "Select * from win32_BIOS"
+
+Get-WmiObject -List
+
+
+Get-WmiObject -class win32_BIOS | select -Property serialnumber
+
+get-wmiobject -List -Class *Network*
+
+get-cimclass -ClassName *Process*
+
+#Information about OS or computer
+
+Get-WmiObject -Class win32_computersystem
+
+get-ciminstance -ClassName win32_computersystem
+
+#Check network configuration
+
+Get-WmiObject -Class win32_networkadapterconfiguration
+
+get-ciminstance -ClassName win32_networkadapterconfiguration
+
+#Check diskspace
+
+Get-WmiObject -Class win32_physicalmemory
+
+get-ciminstance -ClassName win32_physicalmemory
+
+#Azure Powershell 
+#Azure powershell
+
+Connect-AzAccount
+
+Get-AzSubscription
+
+Select-AzSubscription -Subscription 6acbf66d-7b9e-443c-80a3-9d5ab764fd12
+
+#Create resource group
+
+$resourcegroup = "AZPowershell"
+$location = "Central US"
+
+New-AzResourceGroup -name $resourcegroup -location $location
+
+$vmname = "AZPS"
+$admin = "username"
+$pwd = "erthkj"
+
+#create vm
+
+New-AzVM -ResourceGroupName $resourcegroup -Location $location -Name $vmname
+
+Get-AzVM
+
+Stop-AzVM -Name AZPS
+
+remove-azvm -name "AZPS"
+
+Remove-AzResourceGroup -Name AZPowershell 
+
+
+ 
