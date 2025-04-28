@@ -120,3 +120,61 @@ MOVE 'LogicalDataFileName' TO 'C:\DBFiles\FinSecureDBDemo.mdf',
 MOVE 'LogicalLogFileName' TO 'C:\DBFiles\FinSecureDBDemo_log.ldf',
 NOUNLOAD, REPLACE, STATS = 10;
 GO
+
+
+
+
+
+
+
+-- PART 2: Create SQL Server Login
+CREATE LOGIN AppAdmin WITH PASSWORD = 'StrongP@ssw0rd123';
+GO
+
+-- PART 3: Create Database and User
+CREATE DATABASE TechNetDB;
+GO
+
+USE TechNetDB;
+GO
+
+CREATE USER AppAdmin FOR LOGIN AppAdmin;
+GO
+
+ALTER ROLE db_owner ADD MEMBER AppAdmin;
+GO
+
+-- PART 4: Create Table and Grant Permissions
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    ProductName NVARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+INSERT INTO Products (ProductID, ProductName, Price)
+VALUES (1, 'Laptop', 750.00),
+       (2, 'Phone', 300.00);
+GO
+
+GRANT SELECT, INSERT ON Products TO AppAdmin;
+GO
+
+-- As AppAdmin user:
+-- Insert new product
+INSERT INTO Products (ProductID, ProductName, Price)
+VALUES (3, 'Tablet', 450.00);
+GO
+
+-- SELECT all products
+SELECT * FROM Products;
+GO
+
+-- PART 5: Deny DELETE permission
+DENY DELETE ON Products TO AppAdmin;
+GO
+
+-- Try to delete (expect failure!)
+DELETE FROM Products WHERE ProductID = 1;
+GO
+
