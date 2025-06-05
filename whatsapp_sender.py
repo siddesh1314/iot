@@ -4,8 +4,8 @@ import random
 from twilio.rest import Client
 
 # Twilio credentials
-ACCOUNT_SID = 'ACdf28ffd182ba57facb1dd76a48c8e97'
-AUTH_TOKEN = 'c83be459bc8d1d195543062768a2d63'
+ACCOUNT_SID = 'ACdf28ffd182ba57facb1dd76a48c8e9rea'
+AUTH_TOKEN = 'c83be459bc8d1d195543062768a2d6kkr'
 
 FROM_WHATSAPP = 'whatsapp:+14155238886'
 TO_WHATSAPP = 'whatsapp:+91709390832'  # 
